@@ -5,8 +5,15 @@ import SwiftSyntax
 
 class TestFinder: SyntaxVisitor {
     var discoveredSuites = [String: TestSuite]()
-    var freestandingTests = Set<Test>()
     var typeContextStack = [String]()
+    
+    let targetTests: TargetTests
+    
+    init(targetTests: TargetTests) {
+        self.targetTests = targetTests
+        
+        super.init(viewMode: .fixedUp)
+    }
     
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         let structure = Struct(node)
@@ -30,9 +37,13 @@ class TestFinder: SyntaxVisitor {
             // Looking for a custom Suite name,
             // which can only be applied by @Suite
             if let suiteName = macroAttr.arguments.first?.expr.asStringLiteral?.value {
-                discoveredSuites[structName] = TestSuite(name: suiteName, structName: structName)
+                let suite = TestSuite(name: suiteName, structName: structName, target: targetTests)
+                discoveredSuites[structName] = suite
+                targetTests.suites.append(suite)
             } else {
-                discoveredSuites[structName] = TestSuite(name: nil, structName: structName)
+                let suite = TestSuite(name: nil, structName: structName, target: targetTests)
+                discoveredSuites[structName] = suite
+                targetTests.suites.append(suite)
             }
             
             // No need to check more attributes after @Suite was found
@@ -79,57 +90,34 @@ class TestFinder: SyntaxVisitor {
             // Looking for a custom Test name,
             // which can only be applied by @Test
             if let testName = macroAttr.arguments.first?.expr.asStringLiteral?.value {
-                addTestToCurrentScope(Test(name: testName, function: functionName))
+                addTestToCurrentScope(
+                    name: testName,
+                    functionName: functionName
+                )
             } else {
-                addTestToCurrentScope(Test(name: nil, function: functionName))
+                addTestToCurrentScope(
+                    name: nil,
+                    functionName: functionName
+                )
             }
         }
         
         return .skipChildren
     }
     
-    private func addTestToCurrentScope(_ test: Test) {
+    private func addTestToCurrentScope(name: String?, functionName: String) {
+        var test = Test(name: name, functionName: functionName, target: targetTests)
+        
         guard let suiteName = typeContextStack.last else {
-            freestandingTests.insert(test)
+            targetTests.freestanding.insert(test)
             return
         }
         
-        if var suite = discoveredSuites[suiteName] {
-            suite.tests.append(test)
-            discoveredSuites[suiteName] = suite
-            return
-        }
+        let suite = discoveredSuites[suiteName] ?? TestSuite(name: nil, structName: suiteName, target: targetTests)
         
-        var suite = TestSuite(name: nil, structName: suiteName)
+        test.suite = suite
         suite.tests.append(test)
         
         discoveredSuites[suiteName] = suite
-    }
-}
-
-public struct TestSuite: Hashable, Equatable {
-    public let name: String?
-    public let structName: String
-    public var tests = [Test]()
-    
-    public static func == (lhs: TestSuite, rhs: TestSuite) -> Bool {
-        lhs.name == rhs.name
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
-    }
-}
-
-public struct Test: Hashable, Equatable {
-    public let name: String?
-    public let function: String
-    
-    public static func == (lhs: Test, rhs: Test) -> Bool {
-        lhs.name == rhs.name
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
     }
 }

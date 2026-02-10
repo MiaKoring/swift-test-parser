@@ -8,7 +8,9 @@ extension TestParser {
         let targetPath = target.path ?? "\(pathString)/Tests/\(target.name)"
         let filePaths = getAllSwiftFilePaths(in: targetPath)
         
-        let finder = TestFinder(viewMode: .fixedUp)
+        let targetTests = TargetTests(targetName: target.name, testProductName: target.testProductName!)
+        
+        let finder = TestFinder(targetTests: targetTests)
         
         for filePath in filePaths {
             guard
@@ -21,11 +23,7 @@ extension TestParser {
             finder.walk(sourceFile)
         }
         
-        return TargetTests(
-            targetName: target.name,
-            freestanding: finder.freestandingTests,
-            suites: Array(finder.discoveredSuites.values)
-        )
+        return targetTests
     }
     
     public func getAllSwiftFilePaths(in directoryPath: String) -> [String] {
@@ -64,10 +62,4 @@ extension TestParser {
         
         return swiftFiles
     }
-}
-
-public struct TargetTests {
-    public var targetName: String
-    public var freestanding: Set<Test>
-    public var suites: [TestSuite]
 }

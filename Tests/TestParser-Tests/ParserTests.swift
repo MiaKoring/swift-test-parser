@@ -4,3 +4,5 @@ import Testing
 @Test func example() async throws {
 
 }
+
+@Test func `Ticked function identifiers work`() async throws {}

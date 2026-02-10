@@ -29,26 +29,36 @@ public struct TestParser: Sendable {
             result.append("\n\(line)")
         }
         
-        let parsed = try JSONDecoder()
-            .decode(PackageDump.self, from: result.data(using: .utf8)!)
-            .targets
-            .compactMap {
+        let dump = try JSONDecoder().decode(PackageDump.self, from: result.data(using: .utf8)!)
+        let targets = dump.targets.compactMap {
                 if $0.type == "test" {
-                    return $0
+                    return $0.asTarget(testProductName: "\(dump.name)PackageTests")
                 }
                 return nil
             }
+            
         
-        return parsed
+        return targets
     }
 }
 
 struct PackageDump: Codable {
-    let targets: [Target]
+    let name: String
+    let targets: [TargetDTO]
+}
+
+public struct TargetDTO: Codable, Hashable {
+    public let name: String
+    public let type: String
+    public let path: String?
+    
+    func asTarget(testProductName: String) -> Target {
+        Target(name: name, path: path, testProductName: testProductName)
+    }
 }
 
 public struct Target: Codable, Hashable {
     public let name: String
-    public let type: String
     public let path: String?
+    public var testProductName: String?
 }
