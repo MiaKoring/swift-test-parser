@@ -106,16 +106,26 @@ class TestFinder: SyntaxVisitor {
     }
     
     private func addTestToCurrentScope(name: String?, functionName: String) {
-        var test = Test(name: name, functionName: functionName, target: targetTests)
-        
         guard let suiteName = typeContextStack.last else {
+            let test = Test(
+                name: name,
+                functionName: functionName,
+                suite: nil,
+                target: targetTests
+            )
+            
             targetTests.freestanding.insert(test)
             return
         }
         
         let suite = discoveredSuites[suiteName] ?? TestSuite(name: nil, structName: suiteName, target: targetTests)
         
-        test.suite = suite
+        let test = Test(
+            name: name,
+            functionName: functionName,
+            suite: suite,
+            target: targetTests
+        )
         suite.tests.append(test)
         
         discoveredSuites[suiteName] = suite

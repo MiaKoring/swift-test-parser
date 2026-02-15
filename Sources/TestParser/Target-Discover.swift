@@ -60,5 +60,5 @@ public struct TargetDTO: Codable, Hashable {
 public struct Target: Codable, Hashable {
     public let name: String
     public let path: String?
-    public var testProductName: String?
+    public var testProductName: String
 }

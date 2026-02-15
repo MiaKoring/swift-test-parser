@@ -11,7 +11,7 @@ public final class TargetTests: @unchecked Sendable {
 }
 
 extension TargetTests: TestRunnable {
-    public var filter: String {
-        "\(targetName)"
-    }
+    public var filter: String { "\(targetName)" }
+    
+    public var uiFilter: String { "\(targetName)" }
 }

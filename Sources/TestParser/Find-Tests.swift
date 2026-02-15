@@ -8,7 +8,7 @@ extension TestParser {
         let targetPath = target.path ?? "\(pathString)/Tests/\(target.name)"
         let filePaths = getAllSwiftFilePaths(in: targetPath)
         
-        let targetTests = TargetTests(targetName: target.name, testProductName: target.testProductName!)
+        let targetTests = TargetTests(targetName: target.name, testProductName: target.testProductName)
         
         let finder = TestFinder(targetTests: targetTests)
         

@@ -1,14 +1,15 @@
 import Foundation
+import SystemPackage
 @_exported import SwiftCommand
 
 extension TestParser {
     @MainActor
     public func run(
         _ scope: TestRunnable,
-        lineHandle: @escaping (String) -> Void
+        lineHandle: @escaping (String) throws -> Void
     ) async throws {
         let process = try await Command.findInPath(withName: "swift")!
-            .setCWD(path)
+            .setCWD(FilePath(pathString))
             .addArgument("test")
             .addArgument("--test-product")
             .addArgument(scope.testProductName)
@@ -18,7 +19,7 @@ extension TestParser {
             .spawn()
         
         for try await line in process.stdout.lines {
-            lineHandle(line)
+            try lineHandle(line)
         }
     }
 }

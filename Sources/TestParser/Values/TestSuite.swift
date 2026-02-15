@@ -33,6 +33,14 @@ extension TestSuite {
 }
 
 extension TestSuite: TestRunnable {
+    public var targetName: String {
+        target.targetName
+    }
+    
+    public var uiFilter: String {
+        return "\(target.targetName).\(name ?? structName)"
+    }
+    
     public var testProductName: String {
         target.testProductName
     }
