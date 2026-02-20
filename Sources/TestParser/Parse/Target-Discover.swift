@@ -15,7 +15,7 @@ public struct TestParser: Sendable {
     /// Returns a list of identifiers of SPM `testTarget`s
     /// - Parameters:
     /// - at: The path of the directory containing Package.swift
-    public func testTargets() async throws -> [Target] {
+    public func testTargets() async throws -> ([Target], String) {
         let process = try await Command.findInPath(withName: "swift")!
             .setCWD(path)
             .addArgument("package")
@@ -38,7 +38,7 @@ public struct TestParser: Sendable {
             }
             
         
-        return targets
+        return (targets, dump.name)
     }
 }
 

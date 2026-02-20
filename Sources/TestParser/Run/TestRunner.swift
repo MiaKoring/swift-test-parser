@@ -2,6 +2,7 @@ import Foundation
 import SystemPackage
 @_exported import SwiftCommand
 
+@MainActor
 public struct TestRunner {
     let path: String
     
@@ -9,7 +10,6 @@ public struct TestRunner {
         self.path = path
     }
     
-    @MainActor
     public func run(
         _ scope: TestRunnable,
         outputPath: String,
@@ -35,7 +35,8 @@ public struct TestRunner {
     }
     
     public func build(
-        _ product: String
+        _ product: String,
+        lineHandle: @escaping (String) throws -> Void
     ) async throws {
         let process = try await Command.findInPath(withName: "swift")!
             .setCWD(FilePath(path))
@@ -46,7 +47,7 @@ public struct TestRunner {
             .spawn()
         
         for try await line in process.stdout.lines {
-            print(line)
+            try lineHandle(line)
         }
     }
 }
