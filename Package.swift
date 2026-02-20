@@ -28,7 +28,8 @@ let package = Package(
         .package(
             url: "https://github.com/stackotter/swift-macro-toolkit",
             .upToNextMinor(from: "0.7.0")
-        )
+        ),
+        .package(url: "https://github.com/LebJe/TOMLKit.git", .upToNextMinor(from: "0.6.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -39,6 +40,7 @@ let package = Package(
                 .product(name: "SwiftCommand", package: "SwiftCommand"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "MacroToolkit", package: "swift-macro-toolkit"),
+                .product(name: "TOMLKit", package: "TOMLKit"),
             ]
         ),
         .testTarget(
