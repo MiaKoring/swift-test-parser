@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-test-parser",
+    name: "XSwiftToolsSupport",
     platforms: [
         .macOS(.v14),
         .iOS(.v17)
@@ -12,8 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "TestParser",
-            targets: ["TestParser"]
+            name: "XSwiftToolsSupport",
+            targets: ["XSwiftToolsSupport"]
         ),
     ],
     dependencies: [
@@ -35,7 +35,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "TestParser",
+            name: "XSwiftToolsSupport",
             dependencies: [
                 .product(name: "SwiftCommand", package: "SwiftCommand"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
@@ -44,8 +44,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "TestParser-Tests",
-            dependencies: ["TestParser"]
+            name: "XSwiftToolsSupport-Tests",
+            dependencies: ["XSwiftToolsSupport"]
         ),
     ]
 )

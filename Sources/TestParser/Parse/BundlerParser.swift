@@ -4,9 +4,11 @@ import SystemPackage
 
 public struct BundlerParser {
     let path: String
+    let sbunPath: String
     
-    public init(path: String) {
+    public init(path: String, sbunPath: String) {
         self.path = path
+        self.sbunPath = sbunPath
     }
     
     public func parse() throws -> [String] {
@@ -25,7 +27,7 @@ public struct BundlerParser {
     }
     
     public func simulators() async throws -> [String: String] {
-        let process = try await Command.findInPath(withName: "swift-bundler")!
+        let process = try await Command(executablePath: FilePath(sbunPath))
             .addArgument("simulators")
             .addArgument("list")
             .setStdout(.pipe)
@@ -53,14 +55,15 @@ public struct BundlerParser {
         named name: String,
         environment: [String: String],
         arguments: [String]
-    ) async throws -> Command<UnspecifiedInputSource, PipeOutputDestination, UnspecifiedOutputDestination> {
-        var process = try await Command.findInPath(withName: "swift-bundler")!
-            .setCWD(FilePath(path))
+    ) async throws -> Command<UnspecifiedInputSource, PipeOutputDestination, PipeOutputDestination> {
+        let process = try await Command(executablePath: FilePath(sbunPath))
             .setEnvVariables(environment)
+            .setCWD(FilePath(path))
             .addArgument("run")
             .addArgument(name)
             .addArguments(arguments)
             .setStdout(.pipe)
+            .setStderr(.pipe)
         
         return process
     }

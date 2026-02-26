@@ -57,7 +57,7 @@ public struct TargetDTO: Codable, Hashable {
     }
 }
 
-public struct Target: Codable, Hashable {
+public struct Target: Codable, Hashable, @unchecked Sendable {
     public let name: String
     public let path: String?
     public var testProductName: String
